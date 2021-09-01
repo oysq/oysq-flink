@@ -21,7 +21,7 @@ public class StreamingWCApp {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 对接数据源
-        DataStreamSource<String> source = env.socketTextStream("103.39.222.50", 9527);
+        DataStreamSource<String> source = env.socketTextStream("localhost", 9527);
 
         // 逻辑处理
         source.flatMap(new FlatMapFunction<String, String>() {
