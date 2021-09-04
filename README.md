@@ -48,3 +48,33 @@
 
 #### 取消 job
 `./bin/flink cancel JobID`
+
+---
+
+### 核心 API
+
+#### StreamExecutionEnvironment
+
+1. 获取上下文
+> StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+* `getExecutionEnvironment()` 方法会在不同的环境创建对应的上下文，通常调用该方法即可，不必调用下面两个不同环境时实际执行的方法
+  * 单机部署时：`LocalStreamEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();`
+  * 集群部署时：`StreamExecutionEnvironment env = StreamExecutionEnvironment.createRemoteEnvironment()`
+
+
+#### Source API
+
+1. 设置数据源
+> env.addSource(SourceFunction<OUT> function)
+* `SourceFunction`有三种实现
+  * `SourceFunction`：不支持并行，即并行度为只能为1
+  * `ParallelSourceFunction`：继承`SourceFunction`接口，支持设置并行度
+  * `RichParallelSourceFunction`：继承`ParallelSourceFunction`接口，功能最强大
+
+#### Transformation API
+
+#### Sink API
+
+
+
+
