@@ -7,7 +7,17 @@
 ### 部署
 
 #### 基础架构
-![架构](https://ci.apache.org/projects/flink/flink-docs-release-1.13/fig/deployment_overview.svg)
+![架构](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/deployment_overview.svg)
+
+* FlinkClient
+  * 提交任务的客户端
+* JobManager
+  * 任务调度中心
+  * 只有一个
+  * 高可用（HA）
+* TaskManager
+  * 任务执行点
+  * 有多个
 
 #### 配置文件
 * `conf/flink-conf.yaml`
