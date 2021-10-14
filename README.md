@@ -9,15 +9,18 @@
 #### 基础架构
 ![架构](https://nightlies.apache.org/flink/flink-docs-release-1.14/fig/deployment_overview.svg)
 
-* FlinkClient
-  * 提交任务的客户端
-* JobManager
-  * 任务调度中心
-  * 只有一个
-  * 高可用（HA）
-* TaskManager
-  * 任务执行点
-  * 有多个
+1. 总体架构
+   * `FlinkClient`
+      * 提交任务的客户端
+   * `JobManager`
+      * 任务调度中心
+      * 只有一个
+      * 高可用（HA）
+   * `TaskManager`
+      * 任务执行点
+      * 有多个
+  
+2. 区别和联系：`task` / `slot` / `parallelism`
 
 #### 配置文件
 * `conf/flink-conf.yaml`
@@ -66,8 +69,14 @@
 #### StreamExecutionEnvironment
 
 1. 获取上下文
-> StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-* `getExecutionEnvironment()` 方法会在不同的环境创建对应的上下文，通常调用该方法即可，不必调用下面两个不同环境时实际执行的方法
+> 什么是上下文？可以理解成一个空间、变量或者工具，初始化的时候可以往里面放各种配置什么的，应用可以使用这个上下文取配置、执行方法等。很多框架都有自己的上下文，比如spring、flink等等。
+
+> 获取上下文的方式：
+> 
+> 批处理：ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+>
+> 流处理：StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+* `getExecutionEnvironment()` 方法会在不同的环境（单机/集群）创建对应的上下文，通常调用该方法即可，不必调用下面两个不同环境时实际执行的方法
   * 单机部署时：`LocalStreamEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();`
   * 集群部署时：`StreamExecutionEnvironment env = StreamExecutionEnvironment.createRemoteEnvironment()`
 
