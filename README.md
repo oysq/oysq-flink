@@ -42,7 +42,6 @@
 `source ~/.bash_profile`
 
 #### 启动 / 停止 flink
-
 * `.$FLINK_HOME/bin/start-cluster.sh`
 * `.$FLINK_HOME/bin/stop-cluster.sh`
 
@@ -84,11 +83,24 @@
 #### Source API
 
 1. 设置数据源
-> env.addSource(SourceFunction<OUT> function)
-* `SourceFunction`有三种实现
-  * `SourceFunction`：不支持并行，即并行度为只能为1
-  * `ParallelSourceFunction`：继承`SourceFunction`接口，支持设置并行度
-  * `RichParallelSourceFunction`：继承`ParallelSourceFunction`接口，功能最强大
+   1. `env.addSource(SourceFunction<OUT> function)`
+   2. 几种内置的 Source
+      1. File 类型: `readFile()` / `readTextFile()` / ...
+      2. Socket 类型: `socketTextStream()` / ...
+      3. Collect 类型: `fromCollection()` / `fromElements()` / ...
+      4. Custom 类型（自定义类型）: `addSource()` / `addSource(new FlinkKafkaConsumer<>())` / ...
+
+
+2. 自定义数据源 
+   1. 实现方式：实现指定的接口。
+   2. 有三种接口可以自定义数据源：
+      * `SourceFunction`：不支持并行，即并行度为只能为1
+      * `ParallelSourceFunction`：继承`SourceFunction`接口，支持设置并行度
+      * `RichParallelSourceFunction`：继承`ParallelSourceFunction`接口，功能最强大
+
+3. 并行度
+   1. 全局并行度设置: `env.setParallelism(2);`     // 优先级较低
+   2. 算子并行度设置: `filter.setParallelism(4);`  // 优先级较高，默认是系统CPU核心数
 
 #### Transformation API
 
