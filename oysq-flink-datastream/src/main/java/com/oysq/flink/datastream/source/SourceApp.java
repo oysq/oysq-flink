@@ -38,7 +38,7 @@ public class SourceApp {
         // source.setParallelism(1);// 优先级最高，这里只能设置为1
         System.out.println("source 的并行度：" + source.getParallelism());
 
-        SingleOutputStreamOperator<String> filter = source.filter(s -> StringUtils.isNotBlank(s));// 默认是cpu核心数，优先级最低
+        SingleOutputStreamOperator<String> filter = source.filter(StringUtils::isNotBlank);// 默认是cpu核心数，优先级最低
         // filter.setParallelism(4);// 优先级最高
         System.out.println("filter 的并行度：" + filter.getParallelism());
 
@@ -48,7 +48,7 @@ public class SourceApp {
 
     /**
      * 对接kafka数据源
-     * @param env
+     * @param env 上下文
      */
     public static void test02(StreamExecutionEnvironment env) {
         Properties properties = new Properties();
