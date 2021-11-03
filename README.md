@@ -46,7 +46,7 @@
 * `.$FLINK_HOME/bin/stop-cluster.sh`
 
 #### 校验 flink 启动情况
-1. `jsp` 是否有 `StandaloneSessionClusterEntrypoint` 和 `TaskManagerRunner` 进程
+1. `jps` 是否有 `StandaloneSessionClusterEntrypoint` 和 `TaskManagerRunner` 进程
 2. 访问 `localhost`:`webPort`
 
 #### 提交 job

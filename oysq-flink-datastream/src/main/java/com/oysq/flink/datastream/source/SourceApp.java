@@ -19,6 +19,8 @@ public class SourceApp {
 
         // 测试socket及其并行度
         // test01(env);
+
+        // 连接kafka
         test02(env);
 
         // 执行
@@ -28,7 +30,7 @@ public class SourceApp {
 
     /**
      * 测试并行度
-     * @param env
+     * @param env 上下文
      */
     public static void test01(StreamExecutionEnvironment env) {
 
@@ -51,13 +53,17 @@ public class SourceApp {
      * @param env 上下文
      */
     public static void test02(StreamExecutionEnvironment env) {
-        Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "localhost:9092");
-        properties.setProperty("group.id", "test");
-        DataStream<String> stream = env
-                .addSource(new FlinkKafkaConsumer<>("topic", new SimpleStringSchema(), properties));
 
-        System.out.println(stream.getParallelism());
+        String kafkaServer = System.getenv("KAFKA-SERVER");
+        System.out.println("KAFKA-SERVER: " + kafkaServer);
+
+        Properties properties = new Properties();
+        properties.setProperty("bootstrap.servers", kafkaServer);
+        properties.setProperty("group.id", "group01");
+        DataStream<String> stream = env
+                .addSource(new FlinkKafkaConsumer<>("test01", new SimpleStringSchema(), properties));
+
+        System.out.println("parallelism: " + stream.getParallelism());
         stream.print();
     }
 
