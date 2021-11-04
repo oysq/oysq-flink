@@ -42,21 +42,22 @@ public class TransformationApp {
 
         DataStreamSource<String> streamSource = env.readTextFile("data/access.log");
 
-        streamSource.map(str -> {
-                String[] strArr = str.split(",");
-                return new Access(strArr[0], strArr[1], Long.valueOf(strArr[2]));
-            })
-            .filter(access -> !"ali.com".equals(access.getUrl()))
-            .flatMap((FlatMapFunction<Access, Access>) (access, collector) -> {
-                collector.collect(access);
-                access.setNum(access.getNum()*2);
-                collector.collect(access);
-            })
-            .keyBy(Access::getUrl)
-            .reduce((access1, access2) ->
-                new Access("", access1.getUrl(), access1.getNum() + access2.getNum())
-            )
-            .print();
+        streamSource
+                .map(str -> {
+                    String[] strArr = str.split(",");
+                    return new Access(strArr[0], strArr[1], Long.valueOf(strArr[2]));
+                })
+                .filter(access -> !"ali.com".equals(access.getUrl()))
+                .flatMap((FlatMapFunction<Access, Access>) (access, collector) -> {
+                    collector.collect(access);
+                    access.setNum(access.getNum()*2);
+                    collector.collect(access);
+                })
+                .keyBy(Access::getUrl)
+                .reduce((access1, access2) ->
+                    new Access("", access1.getUrl(), access1.getNum() + access2.getNum())
+                )
+                .print();
 
     }
 
