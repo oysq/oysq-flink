@@ -8,6 +8,9 @@ public class Access {
 
     private Long num;
 
+    public Access() {
+    }
+
     public Access(String dateStr, String url, Long num) {
         this.dateStr = dateStr;
         this.url = url;
