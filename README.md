@@ -63,6 +63,24 @@
 
 ---
 
+### 并行度（Parallel）
+
+> 一个 Flink 任务由多个节点组成（Source/Transformation/Sink），一个节点由多个并行的实例（线程）共同执行，这些实例（线程）的数量就是这个节点的并行度。
+
+#### 并行度的设置（从上往下优先级依次降低）
+
+1. `Operator Level`：在 `Source`/`Transformation`/`Sink` 上使用 `setParallelism()` 方法设置
+2. `Execution Environment Level`：在 `ExecutionEnvironment` 对象上使用 `setParallelism()` 方法，他将作用于上下文的所有 `Operator`
+3. `Client Level`：在将任务提交到 `Flink` 的时候设置，比如 `./bin/flink run -p 10 job.jar`
+4. `System Level`：可以通过配置文件 `flink-conf.yml` 的 `parallelism.default` 属性来指定所有执行环境的默认并行度
+
+#### TaskManager、slot和并行度之间的关系
+
+1. `TaskManager` 的数量是通过 `jps` 命令看到的进程的数量
+2. 若 `taskManager` 数量是3个，且 `flink-conf.yml` 文件配置的 `taskmanager.numberOfTaskSlots = 3`, 则系统总 slot 数量为9个
+3. 若 `Source` 并行度3，则它占用3个slot，同理 `Transformation` 并行度7占用7个slot，`Sink` 并行度5占用5个slot，但总共占用7个slot，因为一个slot可以同时处理1个 `Source` + 1个`Transformation` + 1个`Sink`
+---
+
 ### 核心 API
 
 #### StreamExecutionEnvironment
