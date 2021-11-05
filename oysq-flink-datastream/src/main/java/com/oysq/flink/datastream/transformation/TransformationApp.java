@@ -1,8 +1,12 @@
 package com.oysq.flink.datastream.transformation;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.util.Collector;
 
 public class TransformationApp {
 
@@ -45,6 +49,7 @@ public class TransformationApp {
                     access.setNum(access.getNum()*2);
                     collector.collect(access);
                 })
+                .returns(TypeInformation.of(new TypeHint<Access>() {}))
                 .keyBy(Access::getUrl)
                 .reduce((access1, access2) ->
                     new Access("", access1.getUrl(), access1.getNum() + access2.getNum())

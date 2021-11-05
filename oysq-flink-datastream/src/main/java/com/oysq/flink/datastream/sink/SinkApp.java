@@ -14,7 +14,8 @@ public class SinkApp {
         DataStreamSource<String> source = env.socketTextStream("localhost", 9527);
         System.out.println("source 的并行度：" + source.getParallelism());
 
-        source.print();
+        source.print("msg");
+        source.printToErr("msg");
 
         // 执行
         env.execute("SinkApp");
