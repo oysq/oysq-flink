@@ -16,7 +16,10 @@ public class TransformationApp {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // map算子
-        deal(env);
+//        deal(env);
+
+        // 使用 richMap 处理
+        dealWithRichMap(env);
 
         // 执行
         env.execute("TransformationApp");
@@ -58,5 +61,30 @@ public class TransformationApp {
 
     }
 
+    /**
+     * 使用 richMap 处理
+     */
+    private static void dealWithRichMap(StreamExecutionEnvironment env) {
+
+        DataStreamSource<String> streamSource = env.readTextFile("data/access.log");
+
+        streamSource.map(new AccessRichMapFunction());
+
+        streamSource.print();
+
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
