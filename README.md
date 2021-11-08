@@ -116,10 +116,6 @@
       * `ParallelSourceFunction`：继承`SourceFunction`接口，支持设置并行度
       * `RichParallelSourceFunction`：继承`ParallelSourceFunction`接口，功能最强大
 
-3. 并行度
-   1. 全局并行度设置: `env.setParallelism(2);`     // 优先级较低
-   2. 算子并行度设置: `filter.setParallelism(4);`  // 优先级较高，默认是系统CPU核心数
-
 #### Transformation API
 
 1. filter()：过滤满足条件的数据 
