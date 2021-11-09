@@ -1,5 +1,8 @@
 package com.oysq.flink.datastream.source;
 
+import com.oysq.flink.datastream.source.access.AccessSourceV2;
+import com.oysq.flink.datastream.source.mysql.MysqlSource;
+import com.oysq.flink.datastream.source.mysql.User;
 import com.oysq.flink.datastream.transformation.Access;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -25,7 +28,10 @@ public class SourceApp {
         // test02(env);
 
         // 连接自定义数据源
-        test03(env);
+        // test03(env);
+
+        // 连接自定义的 MySQL 数据源
+        test04(env);
 
         // 执行
         env.execute("sourceApp");
@@ -77,12 +83,29 @@ public class SourceApp {
      */
     public static void test03(StreamExecutionEnvironment env) {
 
-        DataStreamSource<Access> accessDataStreamSource = env.addSource(new AccessSource())
-                .setParallelism(1);// 只能是1
+//        DataStreamSource<Access> accessDataStreamSource = env.addSource(new AccessSource())
+//                .setParallelism(1);// 只能是1
+
+        DataStreamSource<Access> accessDataStreamSource = env.addSource(new AccessSourceV2())
+                .setParallelism(2);
 
         System.out.println("并行度：" + accessDataStreamSource.getParallelism());
 
         accessDataStreamSource.print();
+
+    }
+
+    /**
+     * 自定义 MySQL 数据源
+     * @param env 上下文
+     */
+    public static void test04(StreamExecutionEnvironment env) {
+
+        DataStreamSource<User> userDataStreamSource = env.addSource(new MysqlSource());
+
+        System.out.println("并行度：" + userDataStreamSource.getParallelism());
+
+        userDataStreamSource.print();
 
     }
 

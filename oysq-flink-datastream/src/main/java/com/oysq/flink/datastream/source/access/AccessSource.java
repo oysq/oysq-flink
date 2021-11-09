@@ -1,4 +1,4 @@
-package com.oysq.flink.datastream.source;
+package com.oysq.flink.datastream.source.access;
 
 import com.oysq.flink.datastream.transformation.Access;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
