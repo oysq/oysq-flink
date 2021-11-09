@@ -1,5 +1,6 @@
 package com.oysq.flink.datastream.source;
 
+import com.oysq.flink.datastream.transformation.Access;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -21,7 +22,10 @@ public class SourceApp {
         // test01(env);
 
         // 连接kafka
-        test02(env);
+        // test02(env);
+
+        // 连接自定义数据源
+        test03(env);
 
         // 执行
         env.execute("sourceApp");
@@ -67,4 +71,32 @@ public class SourceApp {
         stream.print();
     }
 
+    /**
+     * 自定义数据源
+     * @param env 上下文
+     */
+    public static void test03(StreamExecutionEnvironment env) {
+
+        DataStreamSource<Access> accessDataStreamSource = env.addSource(new AccessSource())
+                .setParallelism(1);// 只能是1
+
+        System.out.println("并行度：" + accessDataStreamSource.getParallelism());
+
+        accessDataStreamSource.print();
+
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
