@@ -15,11 +15,14 @@ public class TransformationApp {
         // 创建上下文
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        // map算子
+        // 常见算子
 //        deal(env);
 
         // 使用 richMap 处理
-        dealWithRichMap(env);
+//        dealWithRichMap(env);
+
+        // 使用 union 算子处理
+        dealWithUnion(env);
 
         // 执行
         env.execute("TransformationApp");
@@ -71,6 +74,22 @@ public class TransformationApp {
         streamSource.map(new AccessRichMapFunction());
 
         streamSource.print();
+
+    }
+
+    /**
+     * 使用 union 处理
+     */
+    private static void dealWithUnion(StreamExecutionEnvironment env) {
+
+        DataStreamSource<String> source1 = env.socketTextStream("localhost", 9527);
+        DataStreamSource<String> source2 = env.socketTextStream("localhost", 9528);
+
+        // 多个 stream 合并成一个 stream
+//        source1.union(source2).print();
+
+        // 自己关联自己，将输出两次
+        source1.union(source1).print();
 
     }
 
