@@ -124,8 +124,8 @@
 4. keyBy(): 按字段分组（如果是用对象多某个字段，对象必须有无参构造器） 
 5. reduce()：将分组后，相同key的数据放到同一个task进行操作，入参是上一个迭代完的数据和这一条新进来的数据 
 6. sum()：聚合函数，用于分组后的常见简单操作
-7. union(): 多个 stream 合并为一个stream，每个流的数据结构要求相同，也可以自己和自己合并，将会处理多次自己
-8. connect(): 两个 stream 合并为一个stream，两个流的数据结构可以不同
+7. union(): 多个 stream 合并为一个stream，每个流的数据结构要求相同，也可以自己和自己合并，将会处理多次自己，后面也是两个流走同一个 Transformation 算子
+8. connect(): 两个 stream 合并为一个stream，两个流的数据结构可以不同，返回类型为 ConnectedStreams，需要借助 CoMap(一进一出) 或 CoFlatMap(一进多出) 才能转为 DataStream，且每个流有自己的 Transformation 算子
 
 #### Sink API
 

@@ -7,8 +7,11 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.datastream.ConnectedStreams;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.co.CoFlatMapFunction;
 import org.apache.flink.streaming.api.functions.co.CoMapFunction;
 import org.apache.flink.util.Collector;
+
+import java.util.Arrays;
 
 public class TransformationApp {
 
@@ -26,8 +29,11 @@ public class TransformationApp {
         // 使用 union 算子处理
 //        dealWithUnion(env);
 
-        // 使用 connect 算子处理
-        dealWithConnect(env);
+        // 使用 connect + CoMap 算子处理
+//        dealWithConnect(env);
+
+        // 使用 connect + CoFlatMap 算子处理
+        dealWithConnectV2(env);
 
         // 执行
         env.execute("TransformationApp");
@@ -99,7 +105,7 @@ public class TransformationApp {
     }
 
     /**
-     * 使用 connect 处理
+     * 使用 connect + CoMap 算子处理
      */
     private static void dealWithConnect(StreamExecutionEnvironment env) {
 
@@ -111,14 +117,43 @@ public class TransformationApp {
 
         // 处理
         connect.map(new CoMapFunction<String, String, String>() {
+
+            // 处理第一个流
             @Override
-            public String map1(String value) throws Exception {
+            public String map1(String value) {
                 return value + "map1";
             }
 
+            // 处理第二个流
             @Override
-            public String map2(String value) throws Exception {
+            public String map2(String value) {
                 return value + "map2";
+            }
+        }).print();
+
+    }
+
+    /**
+     * 使用 connect + CoFlatMap 算子处理
+     */
+    private static void dealWithConnectV2(StreamExecutionEnvironment env) {
+
+        DataStreamSource<String> source1 = env.fromElements("a b c", "q w e");
+        DataStreamSource<String> source2 = env.fromElements("1,2,3", "6,7,8");
+
+        // 合并流
+        source1.connect(source2).flatMap(new CoFlatMapFunction<String, String, String>() {
+
+            // 处理第一个流
+            @Override
+            public void flatMap1(String value, Collector<String> out) {
+                Arrays.stream(value.split(" ")).forEach(out::collect);
+            }
+
+            // 处理第二个流
+            @Override
+            public void flatMap2(String value, Collector<String> out) {
+                Arrays.stream(value.split(",")).forEach(out::collect);
             }
         }).print();
 
