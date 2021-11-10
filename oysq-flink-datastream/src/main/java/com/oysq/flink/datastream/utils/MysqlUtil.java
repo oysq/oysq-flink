@@ -3,6 +3,7 @@ package com.oysq.flink.datastream.utils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class MysqlUtil {
 
@@ -19,9 +20,20 @@ public class MysqlUtil {
         return null;
     }
 
+    public static void closeConnect(Connection connection) {
+        if(null != connection) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static void main(String[] args) {
         try {
             Connection connection = getConnection();
+            if(null == connection) return;
             ResultSet resultSet = connection.createStatement().executeQuery("select * from user");
 
             while (resultSet.next()) {

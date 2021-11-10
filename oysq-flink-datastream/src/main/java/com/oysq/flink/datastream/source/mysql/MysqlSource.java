@@ -12,17 +12,22 @@ public class MysqlSource extends RichSourceFunction<User> {
     private Connection connection;
 
     @Override
-    public void open(Configuration parameters) throws Exception {
+    public void open(Configuration parameters) {
+        System.out.println("=== open ===");
         connection = MysqlUtil.getConnection();
     }
 
     @Override
-    public void close() throws Exception {
-        connection.close();
+    public void close() {
+        System.out.println("=== close ===");
+        MysqlUtil.closeConnect(connection);
     }
 
     @Override
-    public void run(SourceContext ctx) throws Exception {
+    public void run(SourceContext<User> ctx) throws Exception {
+
+        System.out.println("=== run ===");
+
         ResultSet resultSet = connection.createStatement().executeQuery("select * from user");
 
         while (resultSet.next()) {
@@ -36,6 +41,6 @@ public class MysqlSource extends RichSourceFunction<User> {
 
     @Override
     public void cancel() {
-
+        System.out.println("=== cancel ===");
     }
 }
