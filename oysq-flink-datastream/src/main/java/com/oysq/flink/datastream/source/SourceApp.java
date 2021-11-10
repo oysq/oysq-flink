@@ -28,7 +28,7 @@ public class SourceApp {
         // test02(env);
 
         // 连接自定义数据源
-        // test03(env);
+//         test03(env);
 
         // 连接自定义的 MySQL 数据源
         test04(env);
@@ -102,10 +102,10 @@ public class SourceApp {
     public static void test04(StreamExecutionEnvironment env) {
 
         DataStreamSource<User> userDataStreamSource = env.addSource(new MysqlSource());
-
+        userDataStreamSource.setParallelism(2);
         System.out.println("并行度：" + userDataStreamSource.getParallelism());
 
-        userDataStreamSource.print();
+        userDataStreamSource.print().setParallelism(2);
 
     }
 
