@@ -4,8 +4,10 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.streaming.api.datastream.ConnectedStreams;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.co.CoMapFunction;
 import org.apache.flink.util.Collector;
 
 public class TransformationApp {
@@ -22,7 +24,10 @@ public class TransformationApp {
 //        dealWithRichMap(env);
 
         // 使用 union 算子处理
-        dealWithUnion(env);
+//        dealWithUnion(env);
+
+        // 使用 connect 算子处理
+        dealWithConnect(env);
 
         // 执行
         env.execute("TransformationApp");
@@ -92,6 +97,33 @@ public class TransformationApp {
         source1.union(source1).print();
 
     }
+
+    /**
+     * 使用 connect 处理
+     */
+    private static void dealWithConnect(StreamExecutionEnvironment env) {
+
+        DataStreamSource<String> source1 = env.socketTextStream("localhost", 9527);
+        DataStreamSource<String> source2 = env.socketTextStream("localhost", 9528);
+
+        // 合并流
+        ConnectedStreams<String, String> connect = source1.connect(source2);
+
+        // 处理
+        connect.map(new CoMapFunction<String, String, String>() {
+            @Override
+            public String map1(String value) throws Exception {
+                return value + "map1";
+            }
+
+            @Override
+            public String map2(String value) throws Exception {
+                return value + "map2";
+            }
+        }).print();
+
+    }
+
 
 }
 
