@@ -12,6 +12,7 @@ public class PartitionerApp {
 
     /**
      * 分区策略决定的是一条数据要分给自己上游的哪个分区，所以需要注意的是上游的分区数设置不能小于分区器需要的数量
+     * 注意：partitionCustom() 不会改变上游的分区数量
      */
     public static void main(String[] args) throws Exception {
 
