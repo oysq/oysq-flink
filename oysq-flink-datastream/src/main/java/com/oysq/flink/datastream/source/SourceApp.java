@@ -1,12 +1,14 @@
 package com.oysq.flink.datastream.source;
 
 import com.oysq.flink.datastream.source.access.AccessSourceV2;
+import com.oysq.flink.datastream.source.mysql.MysqlSink;
 import com.oysq.flink.datastream.source.mysql.MysqlSource;
 import com.oysq.flink.datastream.source.mysql.User;
 import com.oysq.flink.datastream.transformation.Access;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -31,7 +33,10 @@ public class SourceApp {
 //         test03(env);
 
         // 连接自定义的 MySQL 数据源
-        test04(env);
+//        test04(env);
+
+        // 自定义 mysql sink
+        test05(env);
 
         // 执行
         env.execute("sourceApp");
@@ -106,6 +111,21 @@ public class SourceApp {
         System.out.println("并行度：" + userDataStreamSource.getParallelism());
 
         userDataStreamSource.print().setParallelism(2);
+
+    }
+
+    /**
+     * 自定义 mysql sink
+     * @param env 上下文
+     */
+    public static void test05(StreamExecutionEnvironment env) {
+
+        DataStreamSource<String> source = env.readTextFile("data/user.data");
+
+        source.map(str -> {
+            String[] split = str.split(",");
+            return new User(null, split[0], Integer.valueOf(split[1]));
+        }).addSink(new MysqlSink());
 
     }
 

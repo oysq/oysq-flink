@@ -2,24 +2,24 @@ package com.oysq.flink.datastream.source.mysql;
 
 public class User {
 
-    private int id;
+    private Integer id;
     private String name;
     private Integer age;
 
     public User() {
     }
 
-    public User(int id, String name, Integer age) {
+    public User(Integer id, String name, Integer age) {
         this.id = id;
         this.name = name;
         this.age = age;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
