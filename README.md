@@ -119,24 +119,32 @@
 #### Transformation API
 
 1. 常见算子
-   * filter()：过滤满足条件的数据
-   * map()：作用在每一个元素上，进来是多少个，出去就是多少个 
-   * flatMap()：作用在每个元素上，一进多出，这个多也可能是一个或没有 
-   * keyBy(): 按字段分组（如果是用对象多某个字段，对象必须有无参构造器） 
-   * reduce()：将分组后，相同key的数据放到同一个task进行操作，入参是上一个迭代完的数据和这一条新进来的数据 
-   * sum()：聚合函数，用于分组后的常见简单操作
-   * union(): 多个 stream 合并为一个stream，每个流的数据结构要求相同，也可以自己和自己合并，将会处理多次自己，后面也是两个流走同一个 Transformation 算子
-   * connect(): 两个 stream 合并为一个stream，两个流的数据结构可以不同，返回类型为 ConnectedStreams，需要借助 CoMap(一进一出) 或 CoFlatMap(一进多出) 才能转为 DataStream，且每个流有自己的 Transformation 算子
+   * `filter()`：过滤满足条件的数据
+   * `map()`：作用在每一个元素上，进来是多少个，出去就是多少个 
+   * `flatMap()`：作用在每个元素上，一进多出，这个多也可能是一个或没有 
+   * `keyBy()`: 按字段分组（如果是用对象多某个字段，对象必须有无参构造器） 
+   * `reduce()`：将分组后，相同key的数据放到同一个task进行操作，入参是上一个迭代完的数据和这一条新进来的数据 
+   * `sum()`：聚合函数，用于分组后的常见简单操作
+   * `union()`: 多个 stream 合并为一个stream，每个流的数据结构要求相同，也可以自己和自己合并，将会处理多次自己，后面也是两个流走同一个 Transformation 算子
+   * `connect()`: 两个 stream 合并为一个stream，两个流的数据结构可以不同，返回类型为 ConnectedStreams，需要借助 CoMap(一进一出) 或 CoFlatMap(一进多出) 才能转为 DataStream，且每个流有自己的 Transformation 算子
 
 2. 分区器
-   1. 常见分区
-      * 
-   2. 自定义分区器
-      1. 作用：分区策略决定的是一条数据要分给自己上游算子的哪个分区
-      2. 注意点：
-         * partitionCustom() 只是指定分配数据给上游的规则，不会改变上游的分区数量
-         * 上游算子的分区数设置不能小于分区器需要的数量
-         * 只会影响跟在后面的第一个算子，再往后的算子与此无关
+   1. 作用：分区策略决定的是一条数据要分给自己上游算子的哪个分区
+   2. 八大分区策略（分区器）：即抽象类 `StreamPartitioner` 的八个实现
+      * `GlobalPartitioner`：都给第一个 `operator`
+      * `ShufflePartitioner`：随机发给某一个 `operator`
+      * `RebalancePartitioner`：循环分发给 `operator`
+      * `RescalePartitioner`：循环分发给 `operator`，但是会基于自己的并行度，和上游的并行度。例如自己并行度是2，上游是4，则自己的第一个实例循环给上游的某两个实例，自己的另一个实例循环给上游的另外两个实例。若自己并行度是4，上游并行度是2，则自己的某两个实例循环给上游的某一个实例。
+      * `BroadcastPartitioner`：广播分区，每个上游实例都分一份自己的数据，适合每个实例的大数据都需要join同一份小数据的场景，比如性别。
+      * `ForwardPartitioner`：分发给本地的`operator`,这个分区器要求上下游的并行度一样，且上下游的算子在同一个`task`内（即为本地）
+      * `KeyGroupStreamPartitioner`：将记录按`key`的`hash`值分发到某个固定实例
+      * `CustomPartitionerWrapper`：使用自定义分区器，传入实现了`Partitioner<K>`接口的实例
+   3. 自定义分区器
+      * 方式：实现 `Partitioner<K>` 接口，调用 `partitionCustom()` 方法传入该实现类的实例
+   4. 注意点：
+      * 分区策略只是指定分配数据给上游的规则，不会改变上游的分区数量
+      * 上游算子的分区数设置不能小于分区器需要的数量
+      * 只会影响跟在后面的第一个算子，再往后的算子与此无关
 
 #### Sink API
 
