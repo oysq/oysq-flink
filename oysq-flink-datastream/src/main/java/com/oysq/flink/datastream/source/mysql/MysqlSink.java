@@ -12,17 +12,17 @@ public class MysqlSink extends RichSinkFunction<User> {
     private Connection connection;
 
     @Override
-    public void open(Configuration parameters) throws Exception {
+    public void open(Configuration parameters) {
         connection = MysqlUtil.getConnection();
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         MysqlUtil.closeConnect(connection);
     }
 
     @Override
-    public void invoke(User user, Context context) throws Exception {
+    public void invoke(User user, Context context) {
 
         System.out.println("==> " + user.toString());
 
