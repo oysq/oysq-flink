@@ -4,5 +4,7 @@
     <file url="file://$PROJECT_DIR$/oysq-flink-basic/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oysq-flink-basic/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/oysq-flink-datastream/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/oysq-flink-project/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/oysq-flink-project/src/main/resources" charset="UTF-8" />
   </component>
 </project>
