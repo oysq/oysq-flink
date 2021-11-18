@@ -115,6 +115,10 @@
       * `SourceFunction`：不支持并行，即并行度为只能为1
       * `ParallelSourceFunction`：继承`SourceFunction`接口，支持设置并行度
       * `RichParallelSourceFunction`：继承`ParallelSourceFunction`接口，功能最强大
+   3. 常见套路：
+      * 在 `open()` 获取链接（每个实例只执行一次，避免每次下沉都重新获取链接）
+      * 在 `close()` 关闭链接（每个实例只执行一次，避免重复关闭）
+      * 在 `invoke()` 执行数据下沉（每条数据执行一次）
 
 #### Transformation API
 
@@ -140,13 +144,22 @@
       * `KeyGroupStreamPartitioner`：将记录按`key`的`hash`值分发到某个固定实例
       * `CustomPartitionerWrapper`：使用自定义分区器，传入实现了`Partitioner<K>`接口的实例
    3. 自定义分区器
-      * 方式：实现 `Partitioner<K>` 接口，调用 `partitionCustom()` 方法传入该实现类的实例
+      * 方式：实现 `Partitioner<K>` 接口，并调用 `partitionCustom()` 方法传入该实现类的实例
    4. 注意点：
       * 分区策略只是指定分配数据给上游的规则，不会改变上游的分区数量
       * 上游算子的分区数设置不能小于分区器需要的数量
       * 只会影响跟在后面的第一个算子，再往后的算子与此无关
 
 #### Sink API
+
+1. 内置 Sink
+2. 自定义 Sink
+
+---
+
+### 注意点
+
+* lambda 表达式在 javac 编译后会使泛型丢失，需要使用 returns() 方法指定返回值类型，所以虽然可以使得算子的代码更简洁，但最好还是用匿名类或者实现类的方式
 
 
 
