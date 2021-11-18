@@ -13,7 +13,7 @@ public class MysqlUtil {
             String user = System.getenv("MYSQL-USER");
             String password = System.getenv("MYSQL-PASSWORD");
             Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection("jdbc:mysql://"+server+"/oysq_flink?useSSL=true&serverTimezone=GMT", user, password);
+            return DriverManager.getConnection("jdbc:mysql://" + server + "/oysq_flink?useSSL=true&serverTimezone=GMT", user, password);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -21,7 +21,7 @@ public class MysqlUtil {
     }
 
     public static void closeConnect(Connection connection) {
-        if(null != connection) {
+        if (null != connection) {
             try {
                 connection.close();
             } catch (SQLException e) {
@@ -33,7 +33,7 @@ public class MysqlUtil {
     public static void main(String[] args) {
         try {
             Connection connection = getConnection();
-            if(null == connection) return;
+            if (null == connection) return;
             ResultSet resultSet = connection.createStatement().executeQuery("select * from user");
 
             while (resultSet.next()) {

@@ -56,6 +56,16 @@ public class Access {
     private String ip;
 
     /**
+     * 省份
+     */
+    private String province;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
      * 时间戳
      */
     private Long time;
@@ -168,6 +178,22 @@ public class Access {
         this.product = product;
     }
 
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     @Override
     public String toString() {
         return "Access{" +
@@ -180,6 +206,8 @@ public class Access {
                 ", uid='" + uid + '\'' +
                 ", nu=" + nu +
                 ", ip='" + ip + '\'' +
+                ", province='" + province + '\'' +
+                ", city='" + city + '\'' +
                 ", time=" + time +
                 ", version='" + version + '\'' +
                 ", product=" + product +
