@@ -41,7 +41,7 @@ public class OsUserCntV1App {
                     }
                 })
                 .sum(2)
-                .print()
+                .print("按操作系统维度统计：")
                 .setParallelism(1);
 
         // 执行

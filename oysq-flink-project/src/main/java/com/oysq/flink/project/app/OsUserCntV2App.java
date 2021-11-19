@@ -2,6 +2,7 @@ package com.oysq.flink.project.app;
 
 import com.alibaba.fastjson.JSON;
 import com.oysq.flink.project.domain.Access;
+import com.oysq.flink.project.udf.GaodeLocationMapFunction;
 import com.oysq.flink.project.utils.GaoDeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -30,21 +31,7 @@ public class OsUserCntV2App {
         source
                 .map(item -> JSON.parseObject(item, Access.class))
                 .filter(access -> "startup".equals(access.getEvent()))
-                .map(new MapFunction<Access, Access>() {
-                    @Override
-                    public Access map(Access access) throws Exception {
-                        try {
-                            Map message = GaoDeUtil.getMessage(access.getIp());
-                            if (message != null) {
-                                access.setProvince(String.valueOf(message.get("province")));
-                                access.setCity(String.valueOf(message.get("city")));
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        return access;
-                    }
-                })
+                .map(new GaodeLocationMapFunction())
                 .map(new MapFunction<Access, Tuple3<String, Integer, Integer>>() {
                     @Override
                     public Tuple3<String, Integer, Integer> map(Access access) {
@@ -58,7 +45,7 @@ public class OsUserCntV2App {
                     }
                 })
                 .sum(2)
-                .print()
+                .print("按省份维度统计：")
                 .setParallelism(1);
 
         // 执行
