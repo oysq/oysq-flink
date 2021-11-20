@@ -197,19 +197,17 @@
 > 
 > 如果 Flink 按 ProcessingTIme 处理，最后结果可能会因为乱序问题，每次都产生不一样的结论
 
-#### 分类
+#### Window 的各种分类
 
-1. 按时间分类 Time-based Window
-   * 按指定的时间长度(区间：左闭右开)划分窗口（同一个窗口的时间长度相同，与窗口内的 event 数量无关）
+1. 是否KeyBy分类
+    * stream.windowAll(...)
+    * stream.keyBy().window(...) // 如果这边用了 windowAll()，则会把所有的key都视为第一个收到的key来处理，并不会报错
 
-2. 按数量分类 Count-based Window
-   * 按指定的数量划分窗口（同一个窗口的 event 数量相同，与窗口的时间长度无关）
-
-3. 按是否KeyBy分类
-   * stream.windowAll(...)
-   * stream.keyBy().window(...) // 如果这边用了 windowAll()，则会把所有的key都视为第一个收到的key来处理，并不会报错
+2. 划分方式分类
+   * 按时间划分（Time-based Window）：按指定的时间长度(区间：左闭右开)划分窗口（同一个窗口的时间长度相同，与窗口内的 event 数量无关）
+   * 按数量划分（Count-based Window）： 按指定的数量划分窗口（同一个窗口的 event 数量相同，与窗口的时间长度无关）
    
-4. 按窗口分配器分类
+3. 窗口分配器分类
    * 作用：窗口分配器的职责是将进来的元素分配到一个或多个窗口中
    * 内置窗口分配器：
       * 滚动窗口 tumbling windows
