@@ -2,6 +2,7 @@ package com.oysq.flink.datastream.window;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -49,7 +50,7 @@ public class WindowApp {
     }
 
     /**
-     * 测试基于 ProcessTime 的滚动窗口 + keyBy
+     * 测试基于 ProcessTime 的滚动窗口 + keyBy + 自定义reduce
      */
     private static void test02(StreamExecutionEnvironment env) {
 
@@ -72,8 +73,18 @@ public class WindowApp {
                         return value.f0;
                     }
                 })
-                .windowAll(TumblingProcessingTimeWindows.of(Time.of(5, TimeUnit.SECONDS)))
-                .sum(1)
+                .window(TumblingProcessingTimeWindows.of(Time.of(5, TimeUnit.SECONDS)))
+//                .sum(1)
+                // 自定义 reduce 实现 sum 的效果
+                .reduce(new ReduceFunction<Tuple2<String, Integer>>() {
+                    @Override
+                    public Tuple2<String, Integer> reduce(Tuple2<String, Integer> value1, Tuple2<String, Integer> value2) throws Exception {
+                        // 因为做了 keyBy，所以 value1.f0 和 value2.f0 肯定是相同的，随便取一个都行
+                        // value1.f1 是上一个 reduce() 执行完的结果，因此是层层累加下来的
+                        System.out.println("value1 = " + value1.toString() + " value2 = " + value2.toString());
+                        return new Tuple2<>(value1.f0, value1.f1+value2.f1);
+                    }
+                })
                 .print();
 
     }
