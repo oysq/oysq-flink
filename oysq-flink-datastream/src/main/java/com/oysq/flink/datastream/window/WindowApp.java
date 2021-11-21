@@ -1,6 +1,7 @@
 package com.oysq.flink.datastream.window;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -20,8 +21,11 @@ public class WindowApp {
         // 测试基于 ProcessTime 的滚动窗口
         // test01(env);
 
-        // 测试基于 ProcessTime 的滚动窗口 + keyBy
-        test02(env);
+        // 测试基于 ProcessTime 的滚动窗口 + keyBy + 自定义reduce
+        // test02(env);
+
+        // 自定义 aggregate 实现分组求平均
+        test03(env);
 
         // 执行
         env.execute("WindowsApp");
@@ -86,6 +90,67 @@ public class WindowApp {
                     }
                 })
                 .print();
+
+    }
+
+    /**
+     * 自定义 aggregate 实现分组求平均
+     */
+    private static void test03(StreamExecutionEnvironment env) {
+
+        // a,1
+        // a,2
+        // b,1
+        env.socketTextStream("localhost", 9527)
+                .map(new MapFunction<String, Tuple2<String, Integer>>() {
+                    @Override
+                    public Tuple2<String, Integer> map(String value) throws Exception {
+                        if (StringUtils.isBlank(value)) return Tuple2.of("none", 1);
+                        String[] arr = value.split(",");
+                        if(arr.length != 2) return Tuple2.of("none", 1);
+                        return Tuple2.of(arr[0].trim(), Integer.valueOf(arr[1].trim()));
+                    }
+                })
+                .keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
+                    @Override
+                    public String getKey(Tuple2<String, Integer> value) throws Exception {
+                        return value.f0;
+                    }
+                })
+                .window(TumblingProcessingTimeWindows.of(Time.of(5, TimeUnit.SECONDS)))
+                // 自定义 aggregate 实现 求平均
+                .aggregate(new AggregateFunction<Tuple2<String, Integer>, Tuple2<Integer, Integer>, Double>() {
+
+                    // 初始化累加器的值（每个分组的每个窗口只执行一次）
+                    @Override
+                    public Tuple2<Integer, Integer> createAccumulator() {
+                        // (总和, 个数)
+                        return Tuple2.of(0, 0);
+                    }
+
+                    /**
+                     * 累加操作（每条记录执行一次）
+                     * value：新的值
+                     * accumulator：历史累加的状态
+                     */
+                    @Override
+                    public Tuple2<Integer, Integer> add(Tuple2<String, Integer> value, Tuple2<Integer, Integer> accumulator) {
+                        return Tuple2.of(accumulator.f0+value.f1, accumulator.f1+1);
+                    }
+
+                    // 所有记录都遍历累加完之后计算结果（每个分组的每个窗口只执行一次）
+                    @Override
+                    public Double getResult(Tuple2<Integer, Integer> accumulator) {
+                        System.out.println("aaaaa");
+                        return (Double.valueOf(accumulator.f0)) / accumulator.f1;
+                    }
+
+                    // 合并不同分组的累加器，这个方法只有 Session Window 才会调用
+                    @Override
+                    public Tuple2<Integer, Integer> merge(Tuple2<Integer, Integer> a, Tuple2<Integer, Integer> b) {
+                        return Tuple2.of(a.f0+b.f0, a.f1+b.f1);
+                    }
+                }).print();
 
     }
 

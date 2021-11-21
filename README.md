@@ -236,7 +236,7 @@
 
 1. WindowFunction 指在数据进入各自的窗口之后，要对窗口内的数据进行的处理
 2. 种类
-   * 增量：ReduceFunction、AggregateFunction
+   * 增量：ReduceFunction、AggregateFunction（后者更为通用）
    * 全量：ProcessWindowFunction
 
 
