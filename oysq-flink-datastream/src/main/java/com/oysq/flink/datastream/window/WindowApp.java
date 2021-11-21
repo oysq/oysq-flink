@@ -22,16 +22,16 @@ public class WindowApp {
         // 创建上下文
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        // 测试基于 ProcessTime 的滚动窗口
+        // 基于 ProcessTime 的滚动窗口 + Non-Keyed
         // test01(env);
 
-        // 测试基于 ProcessTime 的滚动窗口 + keyBy + 自定义reduce
+        // 基于 ProcessTime 的滚动窗口 + keyBy + 自定义 reduce 实现 求和
         // test02(env);
 
-        // 自定义 aggregate 实现分组求平均
+        // 基于 ProcessTime 的滚动窗口 + keyBy + 自定义 aggregate 实现 分组求平均
         // test03(env);
 
-        // 自定义 process 实现 求最大
+        // 基于 ProcessTime 的滚动窗口 + keyBy + 自定义 process 实现 求最大
         test04(env);
 
         // 执行
