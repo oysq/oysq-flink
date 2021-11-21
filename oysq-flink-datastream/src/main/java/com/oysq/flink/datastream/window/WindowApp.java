@@ -7,9 +7,13 @@ import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.util.Collector;
 
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class WindowApp {
@@ -25,7 +29,10 @@ public class WindowApp {
         // test02(env);
 
         // 自定义 aggregate 实现分组求平均
-        test03(env);
+        // test03(env);
+
+        // 自定义 process 实现 求最大
+        test04(env);
 
         // 执行
         env.execute("WindowsApp");
@@ -151,6 +158,48 @@ public class WindowApp {
                         return Tuple2.of(a.f0+b.f0, a.f1+b.f1);
                     }
                 }).print();
+
+    }
+
+    /**
+     * 自定义 process 实现 求最大
+     */
+    private static void test04(StreamExecutionEnvironment env) {
+
+        // 1
+        // 2
+        // 3
+        env.socketTextStream("localhost", 9527)
+                .map(new MapFunction<String, Tuple2<String, Integer>>() {
+                    @Override
+                    public Tuple2<String, Integer> map(String value) throws Exception {
+                        if (StringUtils.isBlank(value)) return Tuple2.of("pk", 1);
+                        return Tuple2.of("pk", Integer.valueOf(value.trim()));
+                    }
+                })
+                .keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
+                    @Override
+                    public String getKey(Tuple2<String, Integer> value) throws Exception {
+                        return value.f0;
+                    }
+                })
+                .window(TumblingProcessingTimeWindows.of(Time.of(5, TimeUnit.SECONDS)))
+                // 自定义 process 实现 求最大
+                .process(new ProcessWindowFunction<Tuple2<String, Integer>, String, String, TimeWindow>() {
+                    @Override
+                    public void process(String s, ProcessWindowFunction<Tuple2<String, Integer>, String, String, TimeWindow>.Context context, Iterable<Tuple2<String, Integer>> elements, Collector<String> out) throws Exception {
+                        System.out.println("窗口的key = " + s);
+                        System.out.println("窗口的时间 = " + new Date(context.window().getStart()) + " - " + new Date(context.window().getEnd()));
+                        // 遍历该窗口的所有元素，得到最大值
+                        int maxValue = Integer.MIN_VALUE;
+                        for (Tuple2<String, Integer> el : elements) {
+                            maxValue = Math.max(maxValue, el.f1);
+                        }
+                        // 将最大值返回出去
+                        out.collect("max = " + maxValue);
+                    }
+                })
+                .print();
 
     }
 

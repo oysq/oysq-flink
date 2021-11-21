@@ -215,9 +215,9 @@
          * 窗口的划分方式可以按时间或者数量，时间又可以分为按 EventTime 或 ProcessingTime
          * 使用时仅需要设置窗口的大小
       * 滑动窗口 sliding windows
-         * 窗口是滑动的，可能会有重叠，一个 event 可能会被分配到多个窗口
+         * 窗口是滑动的，可能会有重叠，一个 event 可能会被分配到零个、一个或多个窗口
          * 窗口的划分方式可以按时间或者数量，时间又可以分为按 EventTime 或 ProcessingTime（和滚动窗口相同）
-         * 使用时需要设置窗口大小+滑动步长，当大小等于步长时，效果就等同于滚动窗口
+         * 使用时需要设置窗口大小（window size）+滑动步长（window slide），当步长小于大小时，会有部分 event 被一个或多个窗口捕捉，当步长等于大小时，效果就等同于滚动窗口，当步长大于大小时，将有部分 event 不会被捕捉到
       * 会话窗口 session windows
         * 窗口是不连贯的，不会有重叠。一个 event 只会被划分到一个窗口
         * 在指定间隔（session gap）后，还是没有收到新的 event，将认为一个会话结束了，并关闭当前窗口
@@ -236,8 +236,9 @@
 
 1. WindowFunction 指在数据进入各自的窗口之后，要对窗口内的数据进行的处理
 2. 种类
-   * 增量：ReduceFunction、AggregateFunction（后者更为通用）
-   * 全量：ProcessWindowFunction
+   * ReduceFunction：增量处理，一条数据执行一次
+   * AggregateFunction：增量处理，一条数据执行一次，相比 ReduceFunction 更为通用
+   * ProcessWindowFunction：全量处理，等窗口内数据都到达后，统一处理一次
 
 
 
