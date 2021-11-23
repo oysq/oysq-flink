@@ -16,6 +16,9 @@ import org.apache.flink.util.Collector;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 基于 ProcessTime 的窗口
+ */
 public class WindowApp {
 
     public static void main(String[] args) throws Exception {
