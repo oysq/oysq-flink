@@ -240,6 +240,10 @@
    * AggregateFunction：增量处理，一条数据执行一次，相比 ReduceFunction 更为通用
    * ProcessWindowFunction：全量处理，等窗口内数据都到达后，统一处理一次
 
+#### Watermark
+
+
+
 
 
 
