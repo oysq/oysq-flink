@@ -242,7 +242,9 @@
 
 #### Watermark
 
-
+> Watermark 是一种延时等待策略
+> 
+> 所标记的当前窗口时间 context.currentWatermark() = 当前数据接收到的最大时间 - 延时等待的时间（规定值）
 
 
 
