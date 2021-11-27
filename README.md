@@ -163,6 +163,8 @@
 
 ### Windows
 
+> Window 是一种左闭右开的区间: [0, 5) -> [5,10) -> ...
+
 #### 时间语义
 
 1. EventTime（Flink 1.12 版本开始，成为默认语义）
@@ -242,9 +244,9 @@
 
 #### Watermark
 
-> Watermark 是一种延时等待策略
+> Watermark 是一种延时等待策略，来自 Google 的 DataFlow 模型，是一种衡量 Event 进展的机制
 
-1. 所标记的当前窗口时间 context.currentWatermark() = 当前数据接收到的最大时间 - 延时等待的时间（规定值）
+1. Watermark 将标记窗口的当前时间为 context.currentWatermark() = 当前数据接收到的最大时间 - 延时等待的时间（规定值）
 2. 通过 `assignTimestampsAndWatermarks()` 方法指定事件时间（EventTime）字段，并设置一定的延时等待时间，等待时间一到，就出发窗口处理方法，然后关闭窗口
 3. 若数据在等待时间后（窗口已经关闭）才到达，则需要通过 `sideOutputLateData()` 方法收集**测流输出**的数据，最后通过 `getSideOutput()` 方法对超过等待时间的数据进行再次处理
 
