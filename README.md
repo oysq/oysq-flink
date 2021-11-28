@@ -290,7 +290,9 @@
    * CheckPoint对Task的影响：可以配置当 CheckPoint 失败时，Task 是否也会挂掉，还是会把消息发送到某个地方，默认是会一起挂掉
    * 是否优先从 CheckPoint 恢复 Task：默认为是
 
-
+4. 重启策略
+   * 重启策略可以在 `flink-conf.yml` 文件内配置，也可以在代码内对 `env` 进行配置，后者优先级更高，会覆盖前者
+   * 重启策略在开启 `CheckPoint` 之后才会生效，默认的重启策略是重试 `Integer.MAX_VALUE` 次，如果还是不行，就结束退出
 
 
 
