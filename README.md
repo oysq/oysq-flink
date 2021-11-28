@@ -163,7 +163,7 @@
 
 ### Windows
 
-> Window 是一种左闭右开的区间: [0, 5) -> [5,10) -> ...
+> Window 是对数据分段处理的方式，每一段称之为一个窗口
 
 #### 时间语义
 
@@ -206,8 +206,8 @@
     * stream.keyBy().window(...) // 如果这边用了 windowAll()，则会把所有的key都视为第一个收到的key来处理，并不会报错
 
 2. 划分方式分类
-   * 按时间划分（Time-based Window）：按指定的时间长度(区间：左闭右开)划分窗口（同一个窗口的时间长度相同，与窗口内的 event 数量无关）
-   * 按数量划分（Count-based Window）： 按指定的数量划分窗口（同一个窗口的 event 数量相同，与窗口的时间长度无关）
+   * 按时间划分（Time-based Window）：按指定的时间长度(区间左闭右开：[0, 5) -> [5,10) -> ...)划分窗口（同一个窗口的时间长度相同，与窗口内的 event 数量无关）
+   * 按数量划分（Count-based Window）：按指定的数量划分窗口（同一个窗口的 event 数量相同，与窗口的时间长度无关）
    
 3. 窗口分配器分类
    * 作用：窗口分配器的职责是将进来的元素分配到一个或多个窗口中
@@ -236,10 +236,10 @@
 
 #### WindowFunction
 
-1. WindowFunction 指在数据进入各自的窗口之后，要对窗口内的数据进行的处理
+1. WindowFunction 指在数据进入各自的窗口之后，要对窗口内的数据进行处理的方法
 2. 种类
    * ReduceFunction：增量处理，一条数据执行一次
-   * AggregateFunction：增量处理，一条数据执行一次，相比 ReduceFunction 更为通用
+   * AggregateFunction：增量处理，一条数据执行一次，相比 ReduceFunction 更为通用，可自定义程度更高
    * ProcessWindowFunction：全量处理，等窗口内数据都到达后，统一处理一次
 
 #### Watermark
@@ -247,8 +247,8 @@
 > Watermark 是一种延时等待策略，来自 Google 的 DataFlow 模型，是一种衡量 Event 进展的机制
 
 1. Watermark 将标记窗口的当前时间为 context.currentWatermark() = 当前数据接收到的最大时间 - 延时等待的时间（规定值）
-2. 通过 `assignTimestampsAndWatermarks()` 方法指定事件时间（EventTime）字段，并设置一定的延时等待时间，等待时间一到，就出发窗口处理方法，然后关闭窗口
-3. 若数据在等待时间后（窗口已经关闭）才到达，则需要通过 `sideOutputLateData()` 方法收集**测流输出**的数据，最后通过 `getSideOutput()` 方法对超过等待时间的数据进行再次处理
+2. 通过 `assignTimestampsAndWatermarks()` 方法指定事件时间（EventTime）字段，并设置一定的延时等待时间，等待时间一到，就触发窗口处理方法，然后销毁窗口
+3. 若数据在等待时间后（窗口已经销毁）才到达，则需要通过 `sideOutputLateData()` 方法收集`测流输出`的数据，最后通过 `getSideOutput()` 方法对超过等待时间的数据进行再次处理
 
 
 

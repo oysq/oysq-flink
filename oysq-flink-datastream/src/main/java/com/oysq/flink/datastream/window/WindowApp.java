@@ -7,7 +7,9 @@ import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -35,7 +37,10 @@ public class WindowApp {
         // test03(env);
 
         // 基于 ProcessTime 的滚动窗口 + keyBy + 自定义 process 实现 求最大
-        test04(env);
+        // test04(env);
+
+        // 其他类型测试
+        test05(env);
 
         // 执行
         env.execute("WindowsApp");
@@ -206,4 +211,44 @@ public class WindowApp {
 
     }
 
+    /**
+     * 其他类型的配置测试
+     * @param env
+     */
+    private static void test05(StreamExecutionEnvironment env) {
+
+        // 1
+        // 2
+        // 3
+        env.socketTextStream("localhost", 9527)
+                .map(new MapFunction<String, Tuple2<String, Integer>>() {
+                    @Override
+                    public Tuple2<String, Integer> map(String value) throws Exception {
+                        if (StringUtils.isBlank(value)) return Tuple2.of("pk", 1);
+                        return Tuple2.of("pk", Integer.valueOf(value.trim()));
+                    }
+                })
+                .keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
+                    @Override
+                    public String getKey(Tuple2<String, Integer> value) throws Exception {
+                        return value.f0;
+                    }
+                })
+                // .window(SlidingProcessingTimeWindows.of(Time.of(5, TimeUnit.SECONDS), Time.of(3, TimeUnit.SECONDS))) // Time-Based Slid
+                // .countWindow(5) // Count-based
+                .countWindow(5, 3) // Count-based Slid
+                .sum(1)
+                .print();
+
+    }
+
 }
+
+
+
+
+
+
+
+
+
