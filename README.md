@@ -242,7 +242,7 @@
    * AggregateFunction：增量处理，一条数据执行一次，相比 ReduceFunction 更为通用，可自定义程度更高
    * ProcessWindowFunction：全量处理，等窗口内数据都到达后，统一处理一次
 
-#### Watermark
+#### Watermark（水印）
 
 > Watermark 是一种延时等待策略，来自 Google 的 DataFlow 模型，是一种衡量 Event 进展的机制
 
