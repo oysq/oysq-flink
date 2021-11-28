@@ -9,6 +9,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.ProcessingTimeSessionWindows;
+import org.apache.flink.streaming.api.windowing.assigners.SessionWindowTimeGapExtractor;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -234,9 +236,10 @@ public class WindowApp {
                         return value.f0;
                     }
                 })
-                // .window(SlidingProcessingTimeWindows.of(Time.of(5, TimeUnit.SECONDS), Time.of(3, TimeUnit.SECONDS))) // Time-Based Slid
-                // .countWindow(5) // Count-based
-                .countWindow(5, 3) // Count-based Slid
+                // .window(SlidingProcessingTimeWindows.of(Time.of(5, TimeUnit.SECONDS), Time.of(3, TimeUnit.SECONDS))) // Time-Based sliding
+                // .window(ProcessingTimeSessionWindows.withGap(Time.of(3, TimeUnit.SECONDS))) // Session Window
+                // .countWindow(5) // Count-based tumbling
+                // .countWindow(5, 3) // Count-based sliding
                 .sum(1)
                 .print();
 
