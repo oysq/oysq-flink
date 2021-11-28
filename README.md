@@ -252,12 +252,12 @@
 
 ### State
 
-> 状态管理是 Flink 的一个强项，它可以支持有状态的数据处理
+> 状态管理是 Flink 的一个强项，它可以支持有状态的数据处理。State 内存储了当前运行的一些信息，比如：当前求和累加到了多少美元、当前已经读取的学生数量等等
 
 * 有状态：每个批次的数据都是基于上一个批次的数据基础上进行的
 * 无状态：每个批次之间没有任何关联
 
-#### 分类
+#### 状态的分类
 
 * Keyed State
    * ValueState
@@ -265,13 +265,30 @@
    * ReducingState
    * AggregatingState
    * MapState
-
 * Operator State
-
 * Broadcast State
 
-> CheckPoint：一种周期性把 State 存储到某个地方的机制
+#### CheckPoint
 
+> CheckPoint：检查点，指 Flink 的容错恢复机制
+
+1. 前置要求
+   * 接入数据的数据源需要支持一定时间范围内的回放，因为异常时，数据可能是需要重新读取的（例如：Kafka 可以通过 offset 来支持一段时间内的数据回放，默认是7天）
+   * State 必须持久化到一个可靠的文件存储系统内（例如：HDFS、NFS等等）
+
+2. 开启方式
+   * CheckPoint 默认为关闭
+   * 在 StreamExecutionEnvironment 内调用 enableCheckpointing(n) 来开启，n 为持久化周期
+
+3. 配置项
+   * 持久化周期：多久对 CheckPoint 做一次持久化，单位为毫秒
+   * 两次持久化之间的最小时间：例如设置为5秒，则下一次持久化一定要等到本次持久化结束5秒后才会进行（为防止持久化周期过短或持久化耗时过长，导致同时存在两个持久化操作）
+   * 超时时间：对 CheckPoint 做持久化到存储时，如果耗时超过这个时间，会中断本次持久化操作
+   * 消费模式：包含精准消费一次（CheckpointingMode.EXACTLY_ONCE）、最少消费一次（CheckpointingMode.AT_LEAST_ONCE）两种模式
+   * 持久化的并行数量：默认情况下，并行度是1（同一时间只能有一个持久化在进行）
+   * 外部的存储：可以配置一个外部存储，把 CheckPoint 存储到外部系统，这样当 Job 挂掉时，可以从外部存储系统来恢复状态
+   * CheckPoint对Task的影响：可以配置当 CheckPoint 失败时，Task 是否也会挂掉，还是会把消息发送到某个地方，默认是会一起挂掉
+   * 是否优先从 CheckPoint 恢复 Task：默认为是
 
 
 

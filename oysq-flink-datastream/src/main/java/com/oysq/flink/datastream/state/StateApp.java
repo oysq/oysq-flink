@@ -1,4 +1,4 @@
-package com.oysq.flink.datastream.window;
+package com.oysq.flink.datastream.state;
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.MapState;
