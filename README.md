@@ -250,7 +250,27 @@
 2. 通过 `assignTimestampsAndWatermarks()` 方法指定事件时间（EventTime）字段，并设置一定的延时等待时间，等待时间一到，就触发窗口处理方法，然后销毁窗口
 3. 若数据在等待时间后（窗口已经销毁）才到达，则需要通过 `sideOutputLateData()` 方法收集`测流输出`的数据，最后通过 `getSideOutput()` 方法对超过等待时间的数据进行再次处理
 
+### State
 
+> 状态管理是 Flink 的一个强项，它可以支持有状态的数据处理
+
+* 有状态：每个批次的数据都是基于上一个批次的数据基础上进行的
+* 无状态：每个批次之间没有任何关联
+
+#### 分类
+
+* Keyed State
+   * ValueState
+   * ListState
+   * ReducingState
+   * AggregatingState
+   * MapState
+
+* Operator State
+
+* Broadcast State
+
+> CheckPoint：一种周期性把 State 存储到某个地方的机制
 
 
 
