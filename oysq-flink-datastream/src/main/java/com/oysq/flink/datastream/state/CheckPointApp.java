@@ -4,9 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.time.Time;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class CheckPointApp {
@@ -40,6 +42,16 @@ public class CheckPointApp {
                         return "none";
                     }
                 })
+                .map(new MapFunction<String, Tuple2<String, Integer>>() {
+
+                    @Override
+                    public Tuple2<String, Integer> map(String value) throws Exception {
+                        String[] split = value.split(",");
+                        return Tuple2.of(split[0].trim(), Integer.valueOf(split[1]));
+                    }
+                })
+                .keyBy(x -> x.f0)
+                .sum(1)
                 .print();
 
         // 执行

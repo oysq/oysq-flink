@@ -297,9 +297,18 @@
    * 重启策略在开启 `CheckPoint` 之后才会生效，默认的重启策略是重试 `Integer.MAX_VALUE` 次，如果还是不行，就结束退出
    * 重启次数指的是整个运行期间累计可以重启的次数，而不是某次故障可以重启的次数，即：每次故障都会消耗掉部分次数余额
 
-5. 默认存储位置
-   * State 默认存储在 TaskManager 的内存中，CheckPoint 默认存储在 JobManager 的内存中
-   * 所以开启 CheckPoint 之后，Task 挂了会从 JobManager 那边恢复 State，而整个 Flink 挂了，就找不回来了（根本原因是 jvm 挂了，内存清空了）
+5. State Backend
+   1. Backend 是 CheckPoint 内对 State 定时备份的机制
+   2. 存储位置：
+      * State 默认存储在 TaskManager 的内存中，CheckPoint 默认存储在 JobManager 的内存中
+      * 所以开启 CheckPoint 之后，Task 挂了会从 JobManager 那边恢复 State，而整个 Flink 挂了，就找不回来了（根本原因是 jvm 挂了，内存清空了）
+      * 可以存储在：JobManager memory, file system, database
+   3. 配置方式：
+      * `env.setStateBackend(...)`
+      * 内置（ootb: Out of the box）的三种 Backend 方式
+         * MemoryStateBackend（默认配置）
+         * FsStateBackend
+         * RocksDBStateBackend
 
 
 
