@@ -23,7 +23,7 @@ public class CheckPointApp {
         // 配置重启策略：只重启5次，每次间隔3秒（最后会发现启动了6次，因为还有第一次正常的启动，不算是重启）
         env.setRestartStrategy(RestartStrategies.fixedDelayRestart(
                 5,
-                Time.of(3, TimeUnit.SECONDS)
+                Time.of(1, TimeUnit.SECONDS)
         ));
 
         // 连接数据源
