@@ -298,18 +298,33 @@
    * 重启次数指的是整个运行期间累计可以重启的次数，而不是某次故障可以重启的次数，即：每次故障都会消耗掉部分次数余额
 
 5. State Backend
-   1. Backend 是 CheckPoint 内对 State 定时备份的机制
-   2. 存储位置：
-      * State 默认存储在 TaskManager 的内存中，CheckPoint 默认存储在 JobManager 的内存中
-      * 所以开启 CheckPoint 之后，Task 挂了会从 JobManager 那边恢复 State，而整个 Flink 挂了，就找不回来了（根本原因是 jvm 挂了，内存清空了）
-      * 可以存储在：JobManager memory, file system, database
-   3. 配置方式：
+   1. Backend 是 CheckPoint 内对 State 定时备份的机制，默认是关闭的
+   2. 配置方式：
+      * 在 `flink-conf.yml` 里配置 `fs.default-scheme: file:///root/app/flink/checkpoints`，这是推荐的做法，因为每个环境的存储配置都不一样
       * `env.setStateBackend(...)`
-      * 内置（ootb: Out of the box）的三种 Backend 方式
-         * MemoryStateBackend（默认配置）
-         * FsStateBackend
-         * RocksDBStateBackend
+      * 可以存储在：JobManager memory, file system, database 三种地方
+   3. 内置的三种 Backend 方式（ootb: Out of the box）
+      1. MemoryStateBackend（默认配置）
+         1. 内存的方式适用于开发，因为对 State 的大小是有限制的，默认是限制5M，可以修改，但是不能超过akka的大小
+         2. 可以设置同步或者异步的方式，同步会阻塞，所以推荐使用异步，默认的配置也是异步
+         3. State 存储在 TaskManager 的内存中，CheckPoint 存储在 JobManager 的内存中
+         4. Task 挂了会从 JobManager 那边恢复 State，而整个 Flink 挂了，就找不回来了（根本原因是 jvm 挂了，内存清空了）
+         5. 故障时从内存读取 State 是默认的行为，不需要配置
+      2. FsStateBackend
+         1. 可以支持大窗口和大 State，适合于生产环境
+         2. 故障时，默认还是会去内存里读取上次状态进行恢复，需要配置才会去读取 FsStateBackend
+      3. RocksDBStateBackend
+         1. 可以支持大窗口和大 State，适合于生产环境
+            1. 故障时，默认还是会去内存里读取上次状态进行恢复，需要配置才会去读取 RocksDBStateBackend
 
+6. 完整使用方式：
+   1. 开启 CheckPoint 并配置故障重启次数，这样故障后会自动从内存读取状态恢复 State
+   2. 配置 Backend 并配置 ExternalizedCheckpoints 为故障不删除
+   3. 在整个 jvm 都挂了（达到重启次数/cancel job）之后，运行 jar 包时指定从哪个地方（fileSystem/database）的 Backend 恢复 State
+
+7. 注意点：
+   * 当配置了 Backend 的方式为文件系统或数据库时，State 还是会以内存的方式再存储一份，用于故障自动重启，所以说自动重启的时候并不会去读取文件系统或数据库
+   * 而文件系统或数据库的那一份存储用于整个任务都挂了之后，手动启动时，指定恢复位置
 
 
 
