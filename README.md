@@ -261,13 +261,13 @@
 
 #### 状态的分类
 
-* Keyed State
+* Keyed State（eg：各种算子）
    * ValueState
    * ListState
    * ReducingState
    * AggregatingState
    * MapState
-* Operator State
+* Operator State（eg：对接Kafka）
 * Broadcast State
 
 #### CheckPoint
