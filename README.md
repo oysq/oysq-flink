@@ -300,10 +300,10 @@
 5. State Backend
    1. Backend 是 CheckPoint 内对 State 定时备份的机制，默认是关闭的
    2. 配置方式：
-      * 在 `flink-conf.yml` 里配置 `: file:///root/app/flink/checkpoints`，这是推荐的做法，因为每个环境的存储配置都不一样
+      * 在 `flink-conf.yml` 里配置 `state.backend: filesystem` 和 `state.checkpoints.dir: file:///home/app/flink/checkpoints`，这是推荐的做法，因为每个环境的存储配置都不一样
       * `env.setStateBackend(...)`
-      * 可以存储在：JobManager memory, file system, database 三种地方
-   3. 内置的三种 Backend 方式（ootb: Out of the box）
+   3. 可以存储在：JobManager memory, file system, database 三种地方
+   4. 内置的三种 Backend 方式（ootb: Out of the box）
       1. MemoryStateBackend（默认配置）
          1. 内存的方式适用于开发，因为对 State 的大小是有限制的，默认是限制5M，可以修改，但是不能超过akka的大小
          2. 可以设置同步或者异步的方式，同步会阻塞，所以推荐使用异步，默认的配置也是异步
@@ -318,13 +318,35 @@
             1. 故障时，默认还是会去内存里读取上次状态进行恢复，需要配置才会去读取 RocksDBStateBackend
 
 6. 完整使用方式：
-   1. 开启 CheckPoint 并配置故障重启次数，这样故障后会自动从内存读取状态恢复 State
-   2. 配置 Backend 并配置 ExternalizedCheckpoints 为故障不删除
-   3. 在整个 jvm 都挂了（达到重启次数/cancel job）之后，运行 jar 包时指定从哪个地方（fileSystem/database）的 Backend 恢复 State
+   1. 代码开启 CheckPoint 并配置故障重启次数，这样故障后会自动从内存读取状态恢复 State
+   2. 在代码或 flink-config.yml 内配置 Backend，注意：代码上要 BackendExternalizedCheckpoints 要设置为故障不删除
+   3. 在整个 jvm 都挂了（达到重启次数/cancel job）之后，在运行 jar 包时指定从哪个地方（`fileSystem`/`database`）的 Backend 恢复 State
+      * UI界面启动方式：在 SavePoint 栏输入 `file:/home/app/flink/checkpoints/3af471c82cf785869b212720632b6f9e/chk-19`
+      * 命令行方式：使用 `-s file:/home/app/flink/checkpoints/3af471c82cf785869b212720632b6f9e/chk-19` 参数指定恢复位置
 
 7. 注意点：
    * 当配置了 Backend 的方式为文件系统或数据库时，State 还是会以内存的方式再存储一份，用于故障自动重启，所以说自动重启的时候并不会去读取文件系统或数据库
    * 而文件系统或数据库的那一份存储用于整个任务都挂了之后，手动启动时，指定恢复位置
+
+#### SavePoint
+
+> SavePoint 和 CheckPoint 在从备份中恢复状态时的操作时一样的，而且双方的生成的文件可以互用
+>
+> 区别是 1.生成备份文件的方式不一样，CheckPoint 由 Flink 管理， SavePoint 需要人工生成；2.概念不一样，CheckPoint 主要用于故障恢复，SavePoint 主要用于升级前的备份
+
+1. 生成备份的操作方式
+   * `./bin/flink savepoint :jobId [:targetDir]`
+   * eg: `./bin/flink savepoint 3af471c82cf785869b212720632b6f9e`
+   * `targetDir` 不指定时，会用 `flink-conf.yml` 内的配置：`state.savepoints.dir`
+
+2. 取消 Job 并生成 SavePoint 的方式
+   * `./bin/flink cancel -s [:targetDir] :jobId`
+
+3. 从 SavePoint 恢复 Job 的方式
+   * `./bin/flink run -s :savepointPath [:runArgs]`
+   * 这里的操作和 `checkPoint` 是一样的
+
+
 
 
 
