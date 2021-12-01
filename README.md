@@ -300,7 +300,7 @@
 5. State Backend
    1. Backend 是 CheckPoint 内对 State 定时备份的机制，默认是关闭的
    2. 配置方式：
-      * 在 `flink-conf.yml` 里配置 `fs.default-scheme: file:///root/app/flink/checkpoints`，这是推荐的做法，因为每个环境的存储配置都不一样
+      * 在 `flink-conf.yml` 里配置 `: file:///root/app/flink/checkpoints`，这是推荐的做法，因为每个环境的存储配置都不一样
       * `env.setStateBackend(...)`
       * 可以存储在：JobManager memory, file system, database 三种地方
    3. 内置的三种 Backend 方式（ootb: Out of the box）
