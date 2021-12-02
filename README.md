@@ -322,7 +322,7 @@
    2. 在代码或 flink-config.yml 内配置 Backend，注意：代码上要 BackendExternalizedCheckpoints 要设置为故障不删除
    3. 在整个 jvm 都挂了（达到重启次数/cancel job）之后，在运行 jar 包时指定从哪个地方（`fileSystem`/`database`）的 Backend 恢复 State
       * UI界面启动方式：在 SavePoint 栏输入 `file:/home/app/flink/checkpoints/3af471c82cf785869b212720632b6f9e/chk-19`
-      * 命令行方式：使用 `-s file:/home/app/flink/checkpoints/3af471c82cf785869b212720632b6f9e/chk-19` 参数指定恢复位置
+      * 命令行方式：`./bin/flink run` 时使用 `-s file:/home/app/flink/checkpoints/3af471c82cf785869b212720632b6f9e/chk-19` 参数指定恢复位置
 
 7. 注意点：
    * 当配置了 Backend 的方式为文件系统或数据库时，State 还是会以内存的方式再存储一份，用于故障自动重启，所以说自动重启的时候并不会去读取文件系统或数据库
@@ -332,7 +332,7 @@
 
 > SavePoint 和 CheckPoint 在从备份中恢复状态时的操作时一样的，而且双方的生成的文件可以互用
 >
-> 区别是 1.生成备份文件的方式不一样，CheckPoint 由 Flink 管理， SavePoint 需要人工生成；2.概念不一样，CheckPoint 主要用于故障恢复，SavePoint 主要用于升级前的备份
+> 区别是 1.生成备份文件的方式不一样，CheckPoint 由 Flink 自行管理， SavePoint 需要人工生成；2.概念不一样，CheckPoint 主要用于故障恢复，SavePoint 主要用于升级前的备份
 
 1. 生成备份的操作方式
    * `./bin/flink savepoint :jobId [:targetDir]`
@@ -345,7 +345,6 @@
 3. 从 SavePoint 恢复 Job 的方式
    * `./bin/flink run -s :savepointPath [:runArgs]`
    * 这里的操作和 `checkPoint` 是一样的
-
 
 
 
