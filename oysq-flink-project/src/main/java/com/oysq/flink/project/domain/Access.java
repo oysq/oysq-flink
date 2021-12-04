@@ -49,6 +49,7 @@ public class Access {
      * 1新用户  非1老用户
      */
     private Integer nu;
+    public Integer nu1;
 
     /**
      * ip
@@ -205,6 +206,7 @@ public class Access {
                 ", channel='" + channel + '\'' +
                 ", uid='" + uid + '\'' +
                 ", nu=" + nu +
+                ", nu1=" + nu1 +
                 ", ip='" + ip + '\'' +
                 ", province='" + province + '\'' +
                 ", city='" + city + '\'' +

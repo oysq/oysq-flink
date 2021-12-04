@@ -60,9 +60,9 @@ public class UserCountByBloomApp {
                         if(!bloomFilter.mightContain(device)) {
                             bloomFilter.put(device);
                             state.update(bloomFilter);
-                            value.setNu(1);
+                            value.nu1 = 1;
                         } else {
-                            value.setNu(0);
+                            value.nu1 = 0;
                         }
                         out.collect(value);
                     }
