@@ -347,7 +347,10 @@
    * 这里的操作和 `checkPoint` 是一样的
 
 
+### 接入Kafka
 
+#### 偏移量
+* 当 CheckPoint 开启时，偏移量将写入CheckPoint，当 CheckPoint 关闭时，偏移量将写入 Zookeeper
 
 
 
