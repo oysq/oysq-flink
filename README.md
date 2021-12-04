@@ -351,7 +351,7 @@
 
 #### 偏移量管理
 * CheckPoint 开启时，偏移量将写入CheckPoint
-* CheckPoint 关闭时，偏移量将写入 Zookeeper，还可以通过 `enable.auto.commit` 和 `auto.commit.interval.ms` 来再次配置它
+* CheckPoint 关闭时，默认偏移量将写入 Zookeeper，可以通过 `enable.auto.commit` 和 `auto.commit.interval.ms` 来再次配置它
 
 
 
