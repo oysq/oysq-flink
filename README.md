@@ -349,8 +349,9 @@
 
 ### 接入Kafka
 
-#### 偏移量
-* 当 CheckPoint 开启时，偏移量将写入CheckPoint，当 CheckPoint 关闭时，偏移量将写入 Zookeeper
+#### 偏移量管理
+* CheckPoint 开启时，偏移量将写入CheckPoint
+* CheckPoint 关闭时，偏移量将写入 Zookeeper，还可以通过 `enable.auto.commit` 和 `auto.commit.interval.ms` 来再次配置它
 
 
 
