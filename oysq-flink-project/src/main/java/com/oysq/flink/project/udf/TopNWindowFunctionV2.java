@@ -22,9 +22,6 @@ public class TopNWindowFunctionV2 implements WindowFunction<Map<String, Long>, L
         long end = window.getEnd();
 
         Map<String, Long> map = input.iterator().next();
-
-        System.out.println(map.toString());
-
         List<ProductEventCount> list = map.entrySet().stream()
                 .sorted((a, b) -> Long.compare(b.getValue(), a.getValue())).limit(3)
                 .map(item -> new ProductEventCount(event, category, item.getKey(), item.getValue(), start, end))
