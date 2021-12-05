@@ -51,7 +51,7 @@ public class ConfigUtil {
         properties.setProperty("bootstrap.servers", tool.getRequired("kafka.bootstrap.servers"));
         properties.setProperty("group.id", tool.get("kafka.group.id", "group01"));
         properties.setProperty("enable.auto.commit", tool.get("kafka.enable.auto.commit", "false"));// 不自动提交，使用状态来管理
-        properties.setProperty("auto.offset.reset", tool.get("kafka.auto.offset.reset", "latest"));// 当没有状态时，读取最新的数据，有状态或offset时，读取 offset
+        properties.setProperty("auto.offset.reset", tool.get("kafka.auto.offset.reset", "earliest"));// 当没有状态时，读取最新的数据，有状态或offset时，读取 offset
 
         // kafka topic
         String topic = tool.get("kafka.topic", "test01");
