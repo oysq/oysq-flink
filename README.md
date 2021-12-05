@@ -346,6 +346,22 @@
    * `./bin/flink run -s :savepointPath [:runArgs]`
    * 这里的操作和 `checkPoint` 是一样的
 
+#### ExactlyOnce 原理
+
+* 举例：source:kafka -> operator:wordCount -> sink:redis
+* 整个状态的流转过程：
+   * Flink 的 TaskManager 由多个 SubTask 组成，每个 SubTask 会消费 Kafka 的某几个分区（取决于 SubTask 的数量）
+   * 当读取到一条消息时，Flink 会同时记录两个状态：Keyed State 和 Operator State 
+      * Keyed State 的内容是算子的累计状态，比如：a 这个单词目前3次，b 这个单词目前5次
+      * Operator State 的内容是读取 kafka 的偏移量，比如：p1 分区目前偏移量10，p2 分区目前偏移量20
+   * 当 StateBackend 周期到了，会把这两个 State 进行备份。
+* 故障重启实现精准一次消费的原理：
+   * StateBackend 有一个前提，就是本次写入 Sink 必须是成功的，如果不成功，将不会备份此次 State
+   * 而写入 Sink 失败同时会导致 Job 挂掉，这样就不会继续读取 Source
+   * 当我们把 Sink 修好之后，使用 State 重启 job 时，因为失败的 offset 并没有写入 State，job 就会继续从成功的那条记录对应的 offset 继续到 Kafka 读取数据，之前失败的数据就会重新被读取出来，重新进行处理
+   * 这也就是为什么 CheckPoint 的前置要求说接入数据的数据源需要支持一定时间范围内的回放
+
+---
 
 ### 接入Kafka
 
