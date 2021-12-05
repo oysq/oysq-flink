@@ -32,8 +32,8 @@ public class ConfigUtil {
         // 获取配置
         ParameterTool tool = ParameterTool.fromPropertiesFile(args[0]);
         // checkpoint 相关配置
-        env.enableCheckpointing(tool.getInt("checkpoint.interval", 30000), CheckpointingMode.EXACTLY_ONCE);// 30秒一次
-        env.setStateBackend(new FsStateBackend(tool.getRequired("checkpoint.statebackend.dataurl")));
+        env.enableCheckpointing(tool.getInt("checkpoint.interval", 3000), CheckpointingMode.EXACTLY_ONCE);// 3秒一次
+        env.setStateBackend(new FsStateBackend(tool.getRequired("checkpoint.stateBackend.dataUrl")));
         env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
         env.setRestartStrategy(RestartStrategies.fixedDelayRestart(5, Time.of(1, TimeUnit.SECONDS)));
     }
@@ -41,7 +41,7 @@ public class ConfigUtil {
     /**
      * 获取 Kafka Source
      */
-    public static <T> FlinkKafkaConsumer<T> createKafkaConsumer(StreamExecutionEnvironment env, String[] args, Class<? extends DeserializationSchema<T>> deserialization) throws Exception {
+    public static <T> FlinkKafkaConsumer<T> createKafkaConsumer(String[] args, Class<? extends DeserializationSchema<T>> deserialization) throws Exception {
 
         // 获取配置
         ParameterTool tool = ParameterTool.fromPropertiesFile(args[0]);
@@ -49,8 +49,12 @@ public class ConfigUtil {
         // kafka相关参数配置
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", tool.getRequired("kafka.bootstrap.servers"));
-        properties.setProperty("group.id", tool.get("kafka.group.id", "group01"));
-        properties.setProperty("enable.auto.commit", tool.get("kafka.enable.auto.commit", "false"));// 不自动提交，使用状态来管理
+        properties.setProperty("group.id", tool.get("kafka.group.id", "group02"));
+
+        // 新版本不需要这个设置
+        // properties.setProperty("enable.auto.commit", tool.get("kafka.enable.auto.commit", "false"));// 不自动提交，使用状态来管理
+
+        // 当使用默认的 consumer.setStartFromGroupOffsets() 时，如果从 Kafka 的 broker 找不到偏移量，则会使用下面的配置
         properties.setProperty("auto.offset.reset", tool.get("kafka.auto.offset.reset", "latest"));// 当没有状态时，读取最新的数据，有状态或offset时，读取 offset
 
         // kafka topic
@@ -58,7 +62,13 @@ public class ConfigUtil {
         List<String> topicList = Arrays.stream(topic.split(",")).map(String::trim).collect(Collectors.toList());
 
         // 构建并返回 Consumer
-        return new FlinkKafkaConsumer<>(topicList, deserialization.newInstance(), properties);
+        FlinkKafkaConsumer<T> kafkaConsumer = new FlinkKafkaConsumer<>(topicList, deserialization.newInstance(), properties);
+        kafkaConsumer.setCommitOffsetsOnCheckpoints(true);
+        kafkaConsumer.setStartFromLatest();
+
+        System.out.println(properties.toString());
+
+        return kafkaConsumer;
     }
 
     /**

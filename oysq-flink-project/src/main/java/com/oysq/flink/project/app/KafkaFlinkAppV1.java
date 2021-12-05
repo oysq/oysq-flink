@@ -22,7 +22,7 @@ public class KafkaFlinkAppV1 {
         ConfigUtil.setEnvironment(env, args);
 
         // 添加数据源
-        env.addSource(ConfigUtil.createKafkaConsumer(env, args, SimpleStringSchema.class))
+        env.addSource(ConfigUtil.createKafkaConsumer(args, SimpleStringSchema.class))
                 .flatMap(new FlatMapFunction<String, String>() {
                     @Override
                     public void flatMap(String value, Collector<String> out) throws Exception {
