@@ -346,7 +346,7 @@
    * `./bin/flink run -s :savepointPath [:runArgs]`
    * 这里的操作和 `checkPoint` 是一样的
 
-#### ExactlyOnce 原理
+#### Source ExactlyOnce 原理
 
 * 举例：source:kafka -> operator:wordCount -> sink:redis
 * 整个状态的流转过程：
@@ -361,6 +361,13 @@
    * 当我们把 Sink 修好之后，使用 State 重启 job 时，因为失败的 offset 并没有写入 State，job 就会继续从成功的那条记录对应的 offset 继续到 Kafka 读取数据，之前失败的数据就会重新被读取出来，重新进行处理
    * 这也就是为什么 CheckPoint 的前置要求说接入数据的数据源需要支持一定时间范围内的回放
 
+#### Sink ExactlyOnce 原理
+
+* Flink 的 ExactlyOnce 通过两阶段提交的方式来实现：先预提交到第三方（如：kafka），但是不提交事务，当 checkpoint 成功后触发监听事件去通知第三方提交事务，否则通知回滚
+* 若 Sink 的对象（比如某数据库、第三方接口）支持事务，也可以通过实现 Flink 两阶段提交相关的抽象类（`TwoPhaseCommitSinkFunction()`），去自己写一个支持 `exactly once` 模式的 Sink
+* Flink 内置的 Sink 对于 Kafka 支持 `at least once` 和 `exactly once` 两种模式（0.11版本开始），但是对于 ElasticSearch、Redis 只支持 `at least once`
+* 在 `at least once` 模式下，如果第三方支持 `insert()` 和 `update()`，也可以通过更新的方式实现 `exactly once` 相同的效果，即：不存在新增，已存在更新
+ 
 ---
 
 ### 接入Kafka

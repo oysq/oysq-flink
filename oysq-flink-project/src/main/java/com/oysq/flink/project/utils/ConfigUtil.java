@@ -6,6 +6,7 @@ import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.runtime.state.filesystem.FsStateBackend;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -31,7 +32,7 @@ public class ConfigUtil {
         // 获取配置
         ParameterTool tool = ParameterTool.fromPropertiesFile(args[0]);
         // checkpoint 相关配置
-        env.enableCheckpointing(tool.getInt("checkpoint.interval", 30000));// 30秒一次
+        env.enableCheckpointing(tool.getInt("checkpoint.interval", 30000), CheckpointingMode.EXACTLY_ONCE);// 30秒一次
         env.setStateBackend(new FsStateBackend(tool.getRequired("checkpoint.statebackend.dataurl")));
         env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
         env.setRestartStrategy(RestartStrategies.fixedDelayRestart(5, Time.of(1, TimeUnit.SECONDS)));
